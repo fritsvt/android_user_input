@@ -122,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void SetSummary() {
         TextView summary_txt = (TextView) findViewById(R.id.summary_text_view);
+        summary_txt.setVisibility(View.VISIBLE);
 
         summary = "Order summary:\nName: " + name + "\n" +
                 "Amount: " + quantity + "\n"+
