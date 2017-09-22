@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
             age = Integer.parseInt(age_string);
         } catch (Exception e) {
             this.ShowDialog("Error", "Age invalid", "back");
+            return;
         }
 
         RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingBar);
@@ -50,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
                     "Age: " + age + "\n" +
                     "Pizza: " + pizza_string + "\n" +
                     "Rating: " + stars, "Okay!");
+        } else {
+            this.ShowDialog("Error", "Make sure to fill out all the fields", "back");
         }
 
     }
