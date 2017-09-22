@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
             this.ShowDialog("Success!", "Thanks for completing the quiz. \n\n" +
                     "your submission:\nMood: " + mood + "\n" +
                     "Gender: " + gender + "\n" +
+                    "Age: " + age + "\n" +
                     "Pizza: " + pizza_string + "\n" +
                     "Rating: " + stars, "Okay!");
         }
