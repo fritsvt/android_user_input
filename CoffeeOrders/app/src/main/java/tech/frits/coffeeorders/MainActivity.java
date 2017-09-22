@@ -2,9 +2,11 @@ package tech.frits.coffeeorders;
 
 import android.content.Intent;
 import android.icu.text.NumberFormat;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,11 +15,15 @@ import java.util.Random;
 
 import static tech.frits.coffeeorders.R.id.name_input;
 import static tech.frits.coffeeorders.R.id.summary_text_view;
+import static tech.frits.coffeeorders.R.id.top;
+import static tech.frits.coffeeorders.R.id.topping_whipped_checkbox;
 
 public class MainActivity extends AppCompatActivity {
 
     int quantity = 0;
     double price_per_item = 1.99;
+    double chocolate_topping_price = 1.99;
+    double whipped_cream_topping_price = 0.99;
     int last_msg_index = 0;
     String name;
     String toPay;
@@ -28,13 +34,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getSupportActionBar().hide();
+        //getSupportActionBar().hide();
     }
 
     /**
      * Increase quantity function
      */
     public void increaseQuantity(View view) {
+        if (quantity >= 10) {
+            Toast.makeText(getApplicationContext(), "You can only order 10 coffees at a time",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
         quantity++;
         display(quantity);
     }
@@ -77,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        toPay = NumberFormat.getCurrencyInstance().format(amount * price_per_item);
+        this.SetSummary(amount);
 
         String[] pleasePayMessages = {
                 "That would be " + toPay + " please",
@@ -103,8 +114,6 @@ public class MainActivity extends AppCompatActivity {
 
         TextView priceTextView = (TextView) findViewById(R.id.price_text_view);
         priceTextView.setText(toPay);
-
-        this.SetSummary();
     }
 
     private void setFriendlyMessage(String message) {
@@ -117,28 +126,50 @@ public class MainActivity extends AppCompatActivity {
         EditText txtname = (EditText)findViewById(R.id.editText2);
         name = txtname.getText().toString();
 
-        txtname.setText("");
+        //txtname.setText("");
     }
 
-    private void SetSummary() {
+    private void SetSummary(int amount) {
+        double total = amount * price_per_item;
+
         TextView summary_txt = (TextView) findViewById(R.id.summary_text_view);
+        CheckBox whipped_checkBox = (CheckBox) findViewById(R.id.topping_whipped_checkbox);
+        CheckBox chocalte_checkbox = (CheckBox) findViewById(R.id.topping_chocolate_checkbox);
         summary_txt.setVisibility(View.VISIBLE);
 
+        String whipped_topping = "Add whipped cream? ";
+        if (whipped_checkBox.isChecked()) {
+            whipped_topping += "true";
+            total+=whipped_cream_topping_price;
+        } else {
+            whipped_topping += "false";
+        }
+        String chocolate_topping = "Add chocolate? ";
+        if (chocalte_checkbox.isChecked()) {
+            chocolate_topping += "true";
+            total+=chocolate_topping_price;
+        } else {
+            chocolate_topping += "false";
+        }
+        toPay = NumberFormat.getCurrencyInstance().format(total);
+
         summary = "Order summary:\nName: " + name + "\n" +
-                "Amount: " + quantity + "\n"+
-                "Total: " + toPay;
+                whipped_topping + "\n" +
+                chocolate_topping + "\n" +
+                "Amount: " + quantity + "\n" +
+                "Total: " + toPay + "\n" +
+                "Thank you!";
         summary_txt.setText(summary);
 
         this.Share();
     }
 
     private void Share() {
-        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-        sharingIntent.setType("text/plain");
-        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Order summary for your coffee");
-        String shareBody = summary;
-        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-        startActivity(Intent.createChooser(sharingIntent, "Share via"));
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                "mailto","", null));
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Order summary for " + name + "'s coffee");
+        emailIntent.putExtra(Intent.EXTRA_TEXT, summary);
+        startActivity(Intent.createChooser(emailIntent, "Send email..."));
     }
 
 }
